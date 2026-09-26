@@ -13,7 +13,7 @@ const INGREDIENT_IMAGES: Record<IngredientType, ex.ImageSource> = {
   Spaghetti: Resources.pasta,
 };
 
-export class HudElement extends ex.ScreenElement {
+export class HudElement extends ex.Actor {
   private levelText!: ex.Text;
   private chainText!: ex.Text;
   private scoreText!: ex.Text;

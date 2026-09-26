@@ -1,6 +1,7 @@
 import { BOARD_CONFIG, IngredientType } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
+import { Resources } from "../resources";
 
 export interface ResolutionResult {
   clearedCount: number;
@@ -29,7 +30,8 @@ export class BoardResolver {
       } else {
         totalMatches++;
         totalCleared += matchedCells.length;
-
+        Resources.sfx_match.play();
+        this.board.cameraShakeSmall();
         // 1. Clear matched ingredients from board
         for (const { col, row } of matchedCells) {
           this.board.setCell(col, row, null);

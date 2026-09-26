@@ -6,8 +6,8 @@ import { PieceGenerator } from "../Lib/PieceGenerator";
 import { FallingPieceController, PieceControllerDelegate } from "../Lib/FallingPieceController";
 import { BoardResolver } from "../Lib/BoardResolver";
 import { gameEvents } from "../Lib/GameEvents";
-import { loadPrecomposedBoard } from "../Lib/BoardLoader";
-import { SCENARIO_SPAGHETTI_CLUSTER_DROP } from "../../test/TestLayouts";
+import { AudioControlGroup } from "../Actors/audiocontrol";
+import { Resources } from "../resources";
 
 export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private board!: BoardElement;
@@ -24,10 +24,15 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private nextPiece: Piece | null = null;
   private isProcessingBoard: boolean = false;
 
+  private audioControls!: AudioControlGroup;
+
   public override onInitialize(_engine: ex.Engine): void {
     // 1. Mount Board & HUD
     this.board = new BoardElement(BOARD_POSITION);
     this.hud = new HudElement(HUD_POSITION);
+    this.audioControls = new AudioControlGroup(_engine.drawWidth - 80, 30);
+    this.add(this.audioControls);
+
     this.add(this.board);
     this.add(this.hud);
 
@@ -118,6 +123,8 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.chainTarget = targets[Math.min(this.level - 1, targets.length - 1)];
 
     this.currentChain = 0;
+    this.board.cameraShakeLarge();
+    Resources.sfx_level.play();
     this.board.clearBoard();
 
     // Update fall speed for the new level
@@ -147,6 +154,10 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   }
 
   onActivate(context: ex.SceneActivationContext<unknown, undefined>): void {
+    if (this.audioControls) {
+      this.audioControls.updateVisualState();
+    }
+
     this.startNewGame();
   }
 

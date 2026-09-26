@@ -1,5 +1,7 @@
 import * as ex from "excalibur";
 import { HighScoreManager } from "../Lib/HighScoreManager";
+import { MuteButton } from "../Actors/muteButton";
+import { AudioControlGroup } from "../Actors/audiocontrol";
 
 export interface GameOverData {
   finalScore: number;
@@ -10,15 +12,22 @@ export class GameOverScene extends ex.Scene {
   private scoreLabel!: ex.Label;
   private levelLabel!: ex.Label;
   private newRecordLabel!: ex.Label;
+  private audioControls!: AudioControlGroup;
 
   public override onInitialize(engine: ex.Engine): void {
     this.createBackground(engine);
     this.createTitle(engine);
     this.createStats(engine);
     this.createButtons(engine);
+
+    this.audioControls = new AudioControlGroup(engine.drawWidth - 80, 30);
+    this.add(this.audioControls);
   }
 
   public override onActivate(context: ex.SceneActivationContext<GameOverData>): void {
+    if (this.audioControls) {
+      this.audioControls.updateVisualState();
+    }
     if (context.data) {
       const { finalScore, levelReached } = context.data;
 

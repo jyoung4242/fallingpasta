@@ -2,13 +2,14 @@
 import { BoardElement } from "./Actors/board";
 import { HudElement } from "./Actors/hud";
 import { BOARD_POSITION, HUD_POSITION } from "./gameTypes";
-import { loader } from "./resources";
+import { AudioManager } from "./Lib/audioManager";
+import { loader, Resources } from "./resources";
 import { GameOverScene } from "./Scenes/GameOver";
 import { GameScene } from "./Scenes/gameScene";
 import { MainMenuScene } from "./Scenes/mainMenuScene";
 import "./style.css";
 
-import { Engine, DisplayMode, vec } from "excalibur";
+import { Engine, DisplayMode, vec, SoundManager } from "excalibur";
 
 const game = new Engine({
   width: 800, // the width of the canvas
@@ -23,4 +24,6 @@ const game = new Engine({
 });
 
 await game.start(loader);
+AudioManager.init();
+
 game.goToScene("main");

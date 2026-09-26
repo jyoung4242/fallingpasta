@@ -13,7 +13,7 @@ const INGREDIENT_IMAGES: Record<IngredientType, ex.ImageSource> = {
   Spaghetti: Resources.pasta,
 };
 
-export class BoardElement extends ex.ScreenElement {
+export class BoardElement extends ex.Actor {
   private grid: GridCell[][];
   private boardCanvas: ex.Canvas;
   public activePiece: Piece | null = null;
@@ -266,6 +266,13 @@ export class BoardElement extends ex.ScreenElement {
     ctx.stroke();
 
     ctx.restore();
+  }
+
+  public cameraShakeSmall() {
+    this.scene?.camera.shake(5, 1, 300);
+  }
+  public cameraShakeLarge() {
+    this.scene?.camera.shake(5, 5, 600);
   }
 
   private drawActivePiece(ctx: CanvasRenderingContext2D, piece: Piece): void {

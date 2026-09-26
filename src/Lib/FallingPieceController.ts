@@ -2,6 +2,7 @@ import * as ex from "excalibur";
 import { BOARD_CONFIG, Piece, IngredientType } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
+import { Resources } from "../resources";
 
 export interface PieceControllerDelegate {
   onPieceLocked: () => void;
@@ -48,10 +49,12 @@ export class FallingPieceController {
 
     // 1. Handle Discrete Inputs (Rotate & Hard Drop)
     if (keyboard.wasPressed(ex.Keys.Up) || keyboard.wasPressed(ex.Keys.W) || keyboard.wasPressed(ex.Keys.E)) {
+      Resources.sfx_rotate.play();
       this.tryRotate();
     }
 
     if (keyboard.wasPressed(ex.Keys.Space)) {
+      Resources.sfx_move.play();
       this.hardDrop();
       return;
     }
@@ -108,6 +111,7 @@ export class FallingPieceController {
     if (!this.activePiece) return false;
     if (!this.checkCollision(this.activePiece, dir, 0)) {
       this.activePiece.col += dir;
+      Resources.sfx_move.play();
       return true;
     }
     return false;

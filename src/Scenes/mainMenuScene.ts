@@ -1,5 +1,8 @@
 import * as ex from "excalibur";
 import { HighScoreManager } from "../Lib/HighScoreManager";
+import { MuteButton } from "../Actors/muteButton";
+import { AudioControlGroup } from "../Actors/audiocontrol";
+import { Resources } from "../resources";
 
 interface RevivableActor extends ex.Actor {
   revive: () => void;
@@ -8,12 +11,16 @@ interface RevivableActor extends ex.Actor {
 export class MainMenuScene extends ex.Scene {
   private howToPlayOverlay!: RevivableActor;
   private isHowToPlayVisible: boolean = false;
+  private audioControls!: AudioControlGroup;
 
   public override onInitialize(engine: ex.Engine): void {
     this.createBackground(engine);
     this.createTitle(engine);
     this.createMenuButtons(engine);
     this.createHowToPlayOverlay(engine);
+
+    this.audioControls = new AudioControlGroup(engine.drawWidth - 80, 30);
+    this.add(this.audioControls);
   }
 
   private createBackground(engine: ex.Engine): void {
@@ -25,6 +32,12 @@ export class MainMenuScene extends ex.Scene {
       color: ex.Color.fromHex("#1a1a2e"),
     });
     this.add(bg);
+  }
+
+  public override onActivate(): void {
+    if (this.audioControls) {
+      this.audioControls.updateVisualState();
+    }
   }
 
   private createTitle(engine: ex.Engine): void {
@@ -99,6 +112,7 @@ export class MainMenuScene extends ex.Scene {
     playBtn.on("pointerenter", () => (playBtn.color = ex.Color.fromHex("#25f1ed")));
     playBtn.on("pointerleave", () => (playBtn.color = ex.Color.fromHex("#08d9d6")));
     playBtn.on("pointerup", () => {
+      Resources.sfx_select.play();
       engine.goToScene("game"); // Transition to main gameplay scene
     });
 
@@ -248,6 +262,7 @@ export class MainMenuScene extends ex.Scene {
   }
 
   private toggleHowToPlay(show: boolean): void {
+    Resources.sfx_select.play();
     this.isHowToPlayVisible = show;
     if (show) {
       this.howToPlayOverlay.revive();

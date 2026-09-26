@@ -1,4 +1,5 @@
 import * as ex from "excalibur";
+import { Resources } from "./resources";
 
 export const BOARD_CONFIG = {
   COLS: 8,
