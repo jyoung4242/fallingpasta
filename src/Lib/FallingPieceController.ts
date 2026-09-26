@@ -3,6 +3,7 @@ import { BOARD_CONFIG, Piece, IngredientType } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
 import { Resources } from "../resources";
+import { AudioManager } from "./audioManager";
 
 export interface PieceControllerDelegate {
   onPieceLocked: () => void;
@@ -99,12 +100,15 @@ export class FallingPieceController {
     }
   }
 
+  // Example level transition hook
   public setLevelSpeed(level: number): void {
-    // Ramps speed up by 15% each level, capped at a blistering 100ms
+    // Ramps piece fall speed
     this.normalDropInterval = Math.max(100, Math.floor(1000 * Math.pow(0.85, level - 1)));
-
-    // Scale soft drop speed slightly at high levels so soft dropping remains distinct
     this.fastDropInterval = Math.max(20, Math.floor(this.normalDropInterval * 0.1));
+
+    // Ramps BGM playback rate (e.g., +3% speed per level, capped at 1.5x speed)
+    const bgmRate = Math.min(1.5, 1.0 + (level - 1) * 0.03);
+    AudioManager.setBGMPlaybackRate(bgmRate);
   }
 
   public moveHorizontal(dir: number): boolean {

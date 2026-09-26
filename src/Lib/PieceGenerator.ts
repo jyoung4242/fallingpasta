@@ -1,17 +1,38 @@
 import { BOARD_CONFIG, IngredientType, Piece, PieceBlock } from "../gameTypes";
+import { MarbleBag, MarbleBagOptions } from "./marbleBag"; // adjust import path as needed
 
 const MATCHABLE_INGREDIENTS: IngredientType[] = ["Tomato", "Cheese", "Basil", "Meatball", "Garlic", "Bread"];
 
 export class PieceGenerator {
+  private bag: MarbleBag<IngredientType>;
+
+  constructor(options: MarbleBagOptions<IngredientType> = {}) {
+    this.bag = new MarbleBag<IngredientType>(options);
+    this.initBag();
+  }
+
   /**
-   * Pick an ingredient based on the 70/30 matchable vs spaghetti split.
+   * Initializes the bag with a balanced pool of ingredients.
+   * Maintains the target ~15% Spaghetti / 85% Matchables distribution.
+   */
+  private initBag(): void {
+    // Fill matchables (e.g., 3 of each matchable = 18 total)
+    for (const matchable of MATCHABLE_INGREDIENTS) {
+      this.bag.add(matchable, 3);
+    }
+
+    // Fill Spaghetti (3 total to maintain ~14.2% / 15% ratio across a 21-draw cycle)
+    this.bag.add("Spaghetti", 3);
+
+    // Initial shuffle & fill
+    this.bag.refill();
+  }
+
+  /**
+   * Pick an ingredient from the bag.
    */
   private getRandomIngredient(): IngredientType {
-    if (Math.random() < 0.15) {
-      return "Spaghetti";
-    }
-    const idx = Math.floor(Math.random() * MATCHABLE_INGREDIENTS.length);
-    return MATCHABLE_INGREDIENTS[idx];
+    return this.bag.draw() ?? "Tomato"; // Fallback safeguard
   }
 
   /**

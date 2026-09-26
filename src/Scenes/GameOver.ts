@@ -2,6 +2,7 @@ import * as ex from "excalibur";
 import { HighScoreManager } from "../Lib/HighScoreManager";
 import { MuteButton } from "../Actors/muteButton";
 import { AudioControlGroup } from "../Actors/audiocontrol";
+import { AudioManager } from "../Lib/audioManager";
 
 export interface GameOverData {
   finalScore: number;
@@ -177,6 +178,7 @@ export class GameOverScene extends ex.Scene {
     menuBtn.on("pointerenter", () => (menuBtn.color = ex.Color.fromHex("#ff537c")));
     menuBtn.on("pointerleave", () => (menuBtn.color = ex.Color.fromHex("#ff2e63")));
     menuBtn.on("pointerup", () => {
+      AudioManager.playNextBGM();
       engine.goToScene("main");
     });
 

@@ -8,6 +8,7 @@ import { BoardResolver } from "../Lib/BoardResolver";
 import { gameEvents } from "../Lib/GameEvents";
 import { AudioControlGroup } from "../Actors/audiocontrol";
 import { Resources } from "../resources";
+import { AudioManager } from "../Lib/audioManager";
 
 export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private board!: BoardElement;
@@ -139,6 +140,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   }
 
   public onGameOver(): void {
+    AudioManager.setBGMPlaybackRate(1);
     gameEvents.emit("game:over", {
       finalScore: this.score,
       levelReached: this.level,

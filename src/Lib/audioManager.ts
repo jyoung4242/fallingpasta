@@ -11,7 +11,8 @@ export class AudioManager {
   private static isSFXMuted: boolean = false;
   private static currentSND: Sound | null = null;
   private static musicList: Sound[] = [];
-  private static currentIndex: number = 0; // Track current track index
+  private static currentIndex: number = 0;
+  private static currentPlaybackRate: number = 1.0;
 
   public static init(): void {
     try {
@@ -34,6 +35,13 @@ export class AudioManager {
     this.musicList.push(Resources.music_yeah);
     this.playRandomBGM();
     this.applyMuteState();
+  }
+
+  public static setBGMPlaybackRate(rate: number): void {
+    this.currentPlaybackRate = Math.max(0.5, Math.min(rate, 2.0)); // Clamp between 0.5x and 2.0x
+    if (this.currentSND) {
+      this.currentSND.playbackRate = this.currentPlaybackRate;
+    }
   }
 
   public static toggleBGMMute(): boolean {
@@ -79,6 +87,7 @@ export class AudioManager {
     this.currentIndex = Math.floor(Math.random() * this.musicList.length);
     let snd = this.musicList[this.currentIndex];
     this.currentSND = snd;
+    this.currentSND.playbackRate = this.currentPlaybackRate;
     console.log("sound is picked", snd);
     if (!this.isBGMMuted) {
       snd.play();
@@ -94,6 +103,7 @@ export class AudioManager {
 
     this.currentIndex = (this.currentIndex + 1) % this.musicList.length;
     this.currentSND = this.musicList[this.currentIndex];
+    this.currentSND.playbackRate = this.currentPlaybackRate;
 
     if (!this.isBGMMuted) {
       this.currentSND.play();
