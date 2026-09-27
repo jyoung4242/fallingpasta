@@ -2,6 +2,7 @@ import { BOARD_CONFIG } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
 import { Resources } from "../resources";
+import { spawnShockwave } from "./particleShockwave";
 
 export interface ResolutionResult {
   clearedCount: number;
@@ -33,6 +34,9 @@ export class BoardResolver {
         Resources.sfx_match.play();
         this.board.cameraShakeSmall();
         for (const { col, row } of matchedCells) {
+          const worldPos = this.board.gridToWorldPosition(col, row);
+          const tileColor = this.board.getCellColor(col, row); // Dynamic color based on matched piece
+          spawnShockwave(this.board.scene!, worldPos, tileColor);
           this.board.setCell(col, row, null);
         }
 

@@ -1,6 +1,18 @@
 import * as ex from "excalibur";
 import { BOARD_CONFIG, Direction, GridCell, IngredientType, PastaNode, Piece } from "../gameTypes";
 import { Resources } from "../resources";
+import { createClearMaterial } from "../Lib/createLevelClearEffect";
+
+// Map Ingredient types to particle colors
+const INGREDIENT_COLORS: Record<IngredientType, ex.Color> = {
+  Tomato: ex.Color.fromHex("#f37159"),
+  Cheese: ex.Color.fromHex("#f8b822"),
+  Basil: ex.Color.fromHex("#64943c"),
+  Meatball: ex.Color.fromHex("#db714d"),
+  Garlic: ex.Color.fromHex("#fef8e7"),
+  Bread: ex.Color.fromHex("#e7a140"),
+  Spaghetti: ex.Color.fromHex("#fcce5f"),
+};
 
 // Map IngredientType strings to loaded ImageSource instances
 const INGREDIENT_IMAGES: Record<IngredientType, ex.ImageSource> = {
@@ -58,6 +70,26 @@ export class BoardElement extends ex.Actor {
       return cell;
     }
     return null;
+  }
+
+  public getCellColor(col: number, row: number): ex.Color {
+    const cell = this.getCell(col, row);
+    if (!cell) return ex.Color.White;
+
+    if (typeof cell === "object" && cell.type === "Spaghetti") {
+      return INGREDIENT_COLORS["Spaghetti"];
+    }
+
+    return INGREDIENT_COLORS[cell as IngredientType] || ex.Color.White;
+  }
+
+  public gridToWorldPosition(col: number, row: number): ex.Vector {
+    const halfTile = BOARD_CONFIG.TILE_SIZE / 2;
+    const localX = col * BOARD_CONFIG.TILE_SIZE + halfTile;
+    const localY = row * BOARD_CONFIG.TILE_SIZE + halfTile;
+
+    // Convert actor-local offset to world position
+    return this.pos.add(ex.vec(localX, localY));
   }
 
   public setCell(col: number, row: number, cellValue: GridCell): void {
@@ -315,5 +347,31 @@ export class BoardElement extends ex.Actor {
       ctx.lineWidth = 2;
       ctx.strokeRect(x, y, tileSize, tileSize);
     }
+  }
+
+  public async triggerLevelClearFX(engine: ex.Engine): Promise<void> {
+    const material = createClearMaterial(engine);
+    this.graphics.material = material;
+    const duration = 800; // ms
+    let elapsed = 0;
+
+    return new Promise(resolve => {
+      const updateHandler = (evt: ex.PreUpdateEvent<ex.Entity>) => {
+        elapsed += evt.elapsed;
+        const progress = Math.min(elapsed / duration, 1.0);
+
+        material.update(ctx => {
+          ctx.uniforms["u_progress"] = progress;
+        });
+
+        this.boardCanvas.flagDirty();
+        if (progress >= 1.0) {
+          this.off("preupdate", updateHandler);
+          this.graphics.material = null;
+          resolve();
+        }
+      };
+      this.on("preupdate", updateHandler);
+    });
   }
 }

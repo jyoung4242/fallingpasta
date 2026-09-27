@@ -88,7 +88,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.currentChain = result.longestSpaghettiChain;
     this.syncHud();
     if (this.currentChain >= this.chainTarget) {
-      this.handleLevelComplete();
+      await this.handleLevelComplete(); // Add await here
       this.isProcessingBoard = false;
       return;
     }
@@ -96,7 +96,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.spawnNextPiece();
   }
 
-  private handleLevelComplete(): void {
+  private async handleLevelComplete(): Promise<void> {
     this.score += 1000;
     this.level++;
 
@@ -105,6 +105,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
 
     this.currentChain = 0;
     this.board.cameraShakeLarge();
+    await this.board.triggerLevelClearFX(this.engine);
     Resources.sfx_level.play();
     this.board.clearBoard();
 
