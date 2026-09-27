@@ -31,10 +31,7 @@ export class HudElement extends ex.Actor {
   }
 
   public override onInitialize(_engine: ex.Engine): void {
-    // Event Subscription
-
     gameEvents.on("state:update", evt => this.onStateUpdate(evt));
-    // 1. Title
     const titleActor = new ex.ScreenElement({ pos: ex.vec(0, 0), anchor: ex.Vector.Zero });
     titleActor.graphics.use(
       new ex.Text({
@@ -44,7 +41,6 @@ export class HudElement extends ex.Actor {
     );
     this.addChild(titleActor);
 
-    // 2. Next Block Preview Label & Canvas
     const nextLabel = new ex.ScreenElement({ pos: ex.vec(0, 80), anchor: ex.Vector.Zero });
     nextLabel.graphics.use(
       new ex.Text({
@@ -63,7 +59,6 @@ export class HudElement extends ex.Actor {
     previewActor.graphics.use(this.previewCanvas);
     this.addChild(previewActor);
 
-    // 3. Level Text
     const levelActor = new ex.ScreenElement({ pos: ex.vec(0, 200), anchor: ex.Vector.Zero });
     this.levelText = new ex.Text({
       text: "Current Level: 1",
@@ -72,7 +67,6 @@ export class HudElement extends ex.Actor {
     levelActor.graphics.use(this.levelText);
     this.addChild(levelActor);
 
-    // 4. Pasta Chain Progress
     const chainActor = new ex.ScreenElement({ pos: ex.vec(0, 270), anchor: ex.Vector.Zero });
     this.chainText = new ex.Text({
       text: "Pasta Chain: 0/3",
@@ -81,7 +75,6 @@ export class HudElement extends ex.Actor {
     chainActor.graphics.use(this.chainText);
     this.addChild(chainActor);
 
-    // 5. Score Label & Value
     const scoreLabel = new ex.ScreenElement({ pos: ex.vec(0, 360), anchor: ex.Vector.Zero });
     scoreLabel.graphics.use(
       new ex.Text({

@@ -7,11 +7,10 @@ export class PauseOverlay extends ex.Actor {
       y: height / 2,
       width,
       height,
-      color: ex.Color.fromRGB(0, 0, 0, 0.75), // Darkened backdrop
-      z: 999, // Ensure it renders above all gameplay elements
+      color: ex.Color.fromRGB(0, 0, 0, 0.75),
+      z: 999,
     });
 
-    // Lock to screen space so camera shake doesn't move it
     this.transform.coordPlane = ex.CoordPlane.Screen;
   }
 

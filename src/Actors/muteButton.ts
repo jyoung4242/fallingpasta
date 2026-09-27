@@ -11,7 +11,7 @@ export class MuteButton extends ex.Actor {
       width: 80,
       height: 36,
       color: ex.Color.fromHex("#252a34"),
-      z: 200, // Keep UI elements on top
+      z: 200,
     });
   }
 
@@ -38,21 +38,19 @@ export class MuteButton extends ex.Actor {
   }
 
   private toggleMute(): void {
-    const isMuted = AudioManager.getIsBGMMuted(); //|| AudioManager.getIsSFXMuted()
+    const isMuted = AudioManager.getIsBGMMuted();
 
     if (isMuted) {
       if (AudioManager.getIsBGMMuted()) AudioManager.toggleBGMMute();
-      //   if (AudioManager.getIsSFXMuted()) AudioManager.toggleSFXMute();
     } else {
       if (!AudioManager.getIsBGMMuted()) AudioManager.toggleBGMMute();
-      //   if (!AudioManager.getIsSFXMuted()) AudioManager.toggleSFXMute();
     }
 
     this.updateVisualState();
   }
 
   public updateVisualState(): void {
-    const isMuted = AudioManager.getIsBGMMuted(); // || AudioManager.getIsSFXMuted()
+    const isMuted = AudioManager.getIsBGMMuted();
     console.log(isMuted, "bgm mute?");
 
     this.label.text = isMuted ? "🔊 MUTED" : "🔊 SOUND";

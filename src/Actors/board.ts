@@ -60,9 +60,6 @@ export class BoardElement extends ex.Actor {
     return null;
   }
 
-  /**
-   * Sets a cell as a simple ingredient or a full PastaNode structure.
-   */
   public setCell(col: number, row: number, cellValue: GridCell): void {
     if (this.isOutOfBounds(col, row)) return;
     this.grid[row][col] = cellValue;
@@ -98,58 +95,6 @@ export class BoardElement extends ex.Actor {
     return ex.vec(col * BOARD_CONFIG.TILE_SIZE, row * BOARD_CONFIG.TILE_SIZE);
   }
 
-  // private drawBoard(ctx: CanvasRenderingContext2D): void {
-  //   const tileSize = BOARD_CONFIG.TILE_SIZE;
-
-  //   // 1. Background Pass
-  //   ctx.fillStyle = "#1E1E24";
-  //   ctx.fillRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
-
-  //   // 2. Grid Pass
-  //   for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
-  //     for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
-  //       const x = c * tileSize;
-  //       const y = r * tileSize;
-
-  //       if ((r + c) % 2 === 1) {
-  //         ctx.fillStyle = "#25252D";
-  //         ctx.fillRect(x, y, tileSize, tileSize);
-  //       }
-
-  //       ctx.strokeStyle = "#2B2D42";
-  //       ctx.lineWidth = 1;
-  //       ctx.strokeRect(x, y, tileSize, tileSize);
-
-  //       // Check for locked PastaNode structure
-  //       const pastaNode = this.getPastaNode(c, r);
-
-  //       if (pastaNode) {
-  //         // Render dynamic connected noodle ONLY after piece has settled & locked connections
-  //         // console.log(`Drawing PastaNode at (${c}, ${r}) with connections:`, pastaNode.connections);
-  //         this.drawPastaNode(ctx, c, r, pastaNode.connections);
-  //       } else {
-  //         // Render static sprite for standard ingredients
-  //         const ingredient = this.getCell(c, r);
-  //         if (ingredient) {
-  //           const imgSource = INGREDIENT_IMAGES[ingredient as IngredientType];
-  //           if (imgSource?.isLoaded()) {
-  //             ctx.drawImage(imgSource.image, x, y, tileSize, tileSize);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // 3. Falling Piece Pass (Uses static sprites)
-  //   if (this.activePiece) {
-  //     this.drawActivePiece(ctx, this.activePiece);
-  //   }
-
-  //   // 4. Board Outer Frame
-  //   ctx.strokeStyle = "#4A4E69";
-  //   ctx.lineWidth = 3;
-  //   ctx.strokeRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
-  // }
   private drawBoard(ctx: CanvasRenderingContext2D): void {
     const tileSize = BOARD_CONFIG.TILE_SIZE; //[cite: 2]
 
@@ -232,74 +177,6 @@ export class BoardElement extends ex.Actor {
     ctx.lineWidth = 3; //[cite: 2]
     ctx.strokeRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT); //[cite: 2]
   }
-
-  /**
-   * Renders a Spaghetti noodle segment using directional connection flags.
-   */
-  // private drawPastaNode(ctx: CanvasRenderingContext2D, col: number, row: number, connections: Record<Direction, boolean>): void {
-  //   const tileSize = BOARD_CONFIG.TILE_SIZE;
-  //   const cx = col * tileSize + tileSize / 2;
-  //   const cy = row * tileSize + tileSize / 2;
-  //   const noodleRadius = 7;
-  //   const noodleWidth = 14;
-
-  //   ctx.save();
-
-  //   // Primary Noodle Base Pass (Warm Golden Pasta)
-  //   ctx.strokeStyle = "#F4A261";
-  //   ctx.fillStyle = "#F4A261";
-  //   ctx.lineWidth = noodleWidth;
-  //   ctx.lineCap = "round";
-  //   ctx.lineJoin = "round";
-
-  //   ctx.beginPath();
-  //   // Central connection hub
-  //   ctx.arc(cx, cy, noodleRadius, 0, Math.PI * 2);
-  //   ctx.fill();
-
-  //   // Extend strokes towards cell edges according to active connections
-  //   if (connections.N) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(cx, row * tileSize);
-  //   }
-  //   if (connections.E) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo((col + 1) * tileSize, cy);
-  //   }
-  //   if (connections.S) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(cx, (row + 1) * tileSize);
-  //   }
-  //   if (connections.W) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(col * tileSize, cy);
-  //   }
-  //   ctx.stroke();
-
-  //   // Inner Sauce Highlight Pass for 3D Depth
-  //   ctx.strokeStyle = "#E9C46A";
-  //   ctx.lineWidth = 4;
-  //   ctx.beginPath();
-  //   if (connections.N) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(cx, row * tileSize);
-  //   }
-  //   if (connections.E) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo((col + 1) * tileSize, cy);
-  //   }
-  //   if (connections.S) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(cx, (row + 1) * tileSize);
-  //   }
-  //   if (connections.W) {
-  //     ctx.moveTo(cx, cy);
-  //     ctx.lineTo(col * tileSize, cy);
-  //   }
-  //   ctx.stroke();
-
-  //   ctx.restore();
-  // }
 
   private drawPastaNodePass(
     ctx: CanvasRenderingContext2D, //[cite: 2]
@@ -404,64 +281,10 @@ export class BoardElement extends ex.Actor {
     ctx.restore(); //
   }
 
-  /**
-   * Pseudo-random generator seeded by cell position & key to ensure seamless borders.
-   */
   private getDeterministicOffset(col: number, row: number, seedKey: number, intensity: number = 2.5): number {
     const seed = (col * 73856093) ^ (row * 19349663) ^ (seedKey * 83492791);
     const x = Math.sin(seed) * 10000;
     return (x - Math.floor(x) - 0.5) * 2 * intensity; // Value between -intensity and +intensity
-  }
-
-  /**
-   * Renders an immutable Spaghetti strand using stored directional connection flags.
-   */
-  private drawPersistentPastaTile(ctx: CanvasRenderingContext2D, col: number, row: number, node: PastaNode): void {
-    const tileSize = BOARD_CONFIG.TILE_SIZE;
-    const cx = col * tileSize + tileSize / 2;
-    const cy = row * tileSize + tileSize / 2;
-    const noodleRadius = 7;
-    const noodleWidth = 14;
-
-    ctx.save();
-
-    // Primary Pasta Stroke Settings
-    ctx.strokeStyle = "#F4A261"; // Warm Spaghetti Orange/Yellow
-    ctx.lineWidth = noodleWidth;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-
-    ctx.beginPath();
-
-    // Center connection hub
-    ctx.arc(cx, cy, noodleRadius, 0, Math.PI * 2);
-
-    // Extend lines outward ONLY for established, locked connections
-    if (node.connections.N) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, row * tileSize);
-    }
-    if (node.connections.E) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo((col + 1) * tileSize, cy);
-    }
-    if (node.connections.S) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, (row + 1) * tileSize);
-    }
-    if (node.connections.W) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(col * tileSize, cy);
-    }
-
-    ctx.stroke();
-
-    // Secondary Sauce/Highlight Inner Line for Depth
-    ctx.strokeStyle = "#E9C46A";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-
-    ctx.restore();
   }
 
   public cameraShakeSmall() {

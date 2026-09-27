@@ -1,10 +1,9 @@
 import * as ex from "excalibur";
-import { Resources } from "./resources";
 
 export const BOARD_CONFIG = {
   COLS: 8,
   ROWS: 16,
-  TILE_SIZE: 48, // 48x48px per cell
+  TILE_SIZE: 48,
   get WIDTH() {
     return this.COLS * this.TILE_SIZE;
   }, // 384px
@@ -34,7 +33,6 @@ export interface GridPos {
 }
 
 export interface PieceBlock {
-  // Relative grid position from piece anchor (0,0)
   relCol: number;
   relRow: number;
   type: IngredientType;
@@ -51,9 +49,6 @@ export class Piece {
     this.blocks = blocks;
   }
 
-  /**
-   * Get world/board grid cells occupied by this piece
-   */
   public getOccupiedCells(): { col: number; row: number; type: IngredientType }[] {
     return this.blocks.map(b => ({
       col: this.col + b.relCol,
@@ -62,9 +57,6 @@ export class Piece {
     }));
   }
 
-  /**
-   * Rotate piece 90 degrees clockwise relative to anchor
-   */
   public rotateClockwise(): void {
     this.blocks = this.blocks.map(b => ({
       relCol: -b.relRow,
@@ -82,14 +74,10 @@ export class Piece {
   }
 }
 
-// Add to gameTypes.ts or SpaghettiChainManager.ts
-
 export type Direction = "N" | "E" | "S" | "W";
-
 export interface PastaNode {
   type: "Spaghetti";
   chainId: number;
   connections: Record<Direction, boolean>;
 }
-
 export type GridCell = IngredientType | PastaNode | null;

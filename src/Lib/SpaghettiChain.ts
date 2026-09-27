@@ -2,10 +2,7 @@ import { BoardElement } from "../Actors/board";
 import { Direction } from "../gameTypes";
 
 export class SpaghettiChainManager {
-  private nextChainId = 1;
-
   public linkNewSpaghettiNodes(board: BoardElement, newCells: { col: number; row: number }[]): void {
-    // Check if cell is string "Spaghetti" OR a PastaNode object with type "Spaghetti"
     const spaghettiCells = newCells.filter(c => {
       const rawCell = board.getCell(c.col, c.row);
       if (typeof rawCell === "string") {

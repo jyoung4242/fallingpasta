@@ -1,4 +1,4 @@
-import { BOARD_CONFIG, IngredientType } from "../gameTypes";
+import { BOARD_CONFIG } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
 import { Resources } from "../resources";
@@ -32,20 +32,15 @@ export class BoardResolver {
         totalCleared += matchedCells.length;
         Resources.sfx_match.play();
         this.board.cameraShakeSmall();
-        // 1. Clear matched ingredients from board
         for (const { col, row } of matchedCells) {
           this.board.setCell(col, row, null);
         }
 
-        // 2. Apply gravity to drop remaining blocks down
         this.applyGravity();
-
-        // 3. Re-link all spaghetti nodes to reflect their new adjacent neighbors
         this.rebuildAllSpaghettiConnections();
       }
     }
 
-    // 4. Compute current longest spaghetti chain on settled board
     const longestChain = this.calculateLongestSpaghettiChain();
 
     return {
@@ -55,13 +50,9 @@ export class BoardResolver {
     };
   }
 
-  /**
-   * Resets all connections across the board and re-evaluates orthogonal neighbors.
-   */
   private rebuildAllSpaghettiConnections(): void {
     const allSpaghettiPositions: { col: number; row: number }[] = [];
 
-    // Step 1: Wipe stale connection state on all existing PastaNodes
     for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
       for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
         const node = this.board.getPastaNode(c, r);
@@ -72,14 +63,12 @@ export class BoardResolver {
       }
     }
 
-    // Step 2: Re-link adjacent nodes using current board positions
     this.chainManager.linkNewSpaghettiNodes(this.board, allSpaghettiPositions);
   }
 
   private findMatch3Cells(): { col: number; row: number }[] {
     const toClear = new Set<string>();
 
-    // Horizontal check
     for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
       let matchLen = 1;
       for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
@@ -99,7 +88,6 @@ export class BoardResolver {
       }
     }
 
-    // Vertical check
     for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
       let matchLen = 1;
       for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
@@ -128,15 +116,12 @@ export class BoardResolver {
   private applyGravity(): void {
     let moved = true;
 
-    // Loop until no more individual tiles or connected spaghetti clusters can drop
     while (moved) {
       moved = false;
 
-      // 1. Identify connected Spaghetti clusters
       const clusters = this.findSpaghettiClusters();
       const processedSpaghetti = new Set<string>();
 
-      // 2. Try moving Spaghetti clusters down as single units
       for (const cluster of clusters) {
         cluster.forEach(c => processedSpaghetti.add(`${c.col},${c.row}`));
 
@@ -146,12 +131,10 @@ export class BoardResolver {
         }
       }
 
-      // 3. Fall standard non-spaghetti tiles (and isolated/unconnected spaghetti)
       for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
         for (let r = BOARD_CONFIG.ROWS - 2; r >= 0; r--) {
           const key = `${c},${r}`;
 
-          // Skip spaghetti nodes handled by cluster logic
           if (processedSpaghetti.has(key)) continue;
 
           const current = this.board.getCell(c, r);
@@ -173,13 +156,11 @@ export class BoardResolver {
     for (const cell of cluster) {
       const targetRow = cell.row + 1;
 
-      // Out of bounds (hit bottom of board)
       if (targetRow >= BOARD_CONFIG.ROWS) return false;
 
       const cellBelowKey = `${cell.col},${targetRow}`;
       const itemBelow = this.board.getCell(cell.col, targetRow);
 
-      // If space below is occupied by something outside this cluster, block the drop
       if (itemBelow !== null && !clusterSet.has(cellBelowKey)) {
         return false;
       }
@@ -189,7 +170,6 @@ export class BoardResolver {
   }
 
   private dropCluster(cluster: { col: number; row: number }[]): void {
-    // Sort bottom-to-top to prevent overwriting cells during downward shift
     const sorted = [...cluster].sort((a, b) => b.row - a.row);
 
     for (const cell of sorted) {
@@ -221,7 +201,6 @@ export class BoardResolver {
             const currNode = this.board.getPastaNode(curr.col, curr.row);
             if (!currNode) continue;
 
-            // Follow explicitly locked connections
             const neighbors = [
               { check: currNode.connections.N, col: curr.col, row: curr.row - 1 },
               { check: currNode.connections.E, col: curr.col + 1, row: curr.row },
@@ -238,7 +217,6 @@ export class BoardResolver {
             }
           }
 
-          // Only treat as a rigid cluster if it actually contains links
           if (cluster.length > 1) {
             clusters.push(cluster);
           }
@@ -281,7 +259,6 @@ export class BoardResolver {
       const node = board.getPastaNode(col, row);
       if (!node) continue;
 
-      // Follow ONLY explicitly locked connections
       if (node.connections.N) stack.push({ col, row: row - 1 });
       if (node.connections.E) stack.push({ col: col + 1, row });
       if (node.connections.S) stack.push({ col, row: row + 1 });
@@ -319,7 +296,6 @@ export class BoardResolver {
 
     let length = 1;
 
-    // Traverse explicitly established directional connections
     if (node.connections.N && !this.board.isOutOfBounds(col, row - 1)) {
       length += this.traverseNodeConnections(col, row - 1, visited);
     }

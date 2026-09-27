@@ -38,7 +38,7 @@ export class AudioManager {
   }
 
   public static setBGMPlaybackRate(rate: number): void {
-    this.currentPlaybackRate = Math.max(0.5, Math.min(rate, 2.0)); // Clamp between 0.5x and 2.0x
+    this.currentPlaybackRate = Math.max(0.5, Math.min(rate, 2.0));
     if (this.currentSND && this.currentSND.isPlaying()) {
       this.currentSND.playbackRate = this.currentPlaybackRate;
     }

@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { BOARD_CONFIG, Piece, IngredientType } from "../gameTypes";
+import { BOARD_CONFIG, Piece } from "../gameTypes";
 import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
 import { Resources } from "../resources";
@@ -14,17 +14,12 @@ export class FallingPieceController {
   private board: BoardElement;
   private delegate: PieceControllerDelegate;
   private chainManager: SpaghettiChainManager = new SpaghettiChainManager(); // Add instance
-
   public activePiece: Piece | null = null;
   private dropTimer: number = 0;
-
-  // Speeds in milliseconds
-  public normalDropInterval: number = 1000; // Normal speed (1 sec per tile)
-  public fastDropInterval: number = 50; // Soft drop speed when holding Down/S
-
-  // Movement repeat delay for smooth horizontal sliding
+  public normalDropInterval: number = 1000;
+  public fastDropInterval: number = 50;
   private keyRepeatTimer: number = 0;
-  private keyRepeatDelay: number = 120; // ms repeat rate for held left/right
+  private keyRepeatDelay: number = 120;
 
   constructor(board: BoardElement, delegate: PieceControllerDelegate) {
     this.board = board;
@@ -35,7 +30,6 @@ export class FallingPieceController {
     this.activePiece = piece;
     this.dropTimer = 0;
 
-    // Check if spawn location is blocked (Game Over condition)
     if (this.checkCollision(this.activePiece, 0, 0)) {
       this.delegate.onGameOver();
       return false;
@@ -48,7 +42,6 @@ export class FallingPieceController {
 
     const keyboard = engine.input.keyboard;
 
-    // 1. Handle Discrete Inputs (Rotate & Hard Drop)
     if (keyboard.wasPressed(ex.Keys.Up) || keyboard.wasPressed(ex.Keys.W) || keyboard.wasPressed(ex.Keys.E)) {
       Resources.sfx_rotate.play();
       this.tryRotate();
@@ -60,15 +53,10 @@ export class FallingPieceController {
       return;
     }
 
-    // 2. Smooth Horizontal Movement (Tap or Hold Left/Right)
     this.handleHorizontalInput(keyboard, delta);
-
-    // 3. Dynamic Soft Drop (Hold Down/S to fall faster)
     const isSoftDropping = keyboard.isHeld(ex.Keys.Down) || keyboard.isHeld(ex.Keys.S);
-
     const currentInterval = isSoftDropping ? this.fastDropInterval : this.normalDropInterval;
 
-    // 4. Gravity Tick
     this.dropTimer += delta;
     if (this.dropTimer >= currentInterval) {
       this.dropTimer = 0;
@@ -83,7 +71,6 @@ export class FallingPieceController {
     const wasLeftPressed = keyboard.wasPressed(ex.Keys.Left) || keyboard.wasPressed(ex.Keys.A);
     const wasRightPressed = keyboard.wasPressed(ex.Keys.Right) || keyboard.wasPressed(ex.Keys.D);
 
-    // Initial press moves immediately
     if (wasLeftPressed) {
       this.moveHorizontal(-1);
       this.keyRepeatTimer = 0;
@@ -91,7 +78,6 @@ export class FallingPieceController {
       this.moveHorizontal(1);
       this.keyRepeatTimer = 0;
     } else if (isLeft || isRight) {
-      // Repeat movement if key is held
       this.keyRepeatTimer += delta;
       if (this.keyRepeatTimer >= this.keyRepeatDelay) {
         this.keyRepeatTimer = 0;
@@ -100,13 +86,9 @@ export class FallingPieceController {
     }
   }
 
-  // Example level transition hook
   public setLevelSpeed(level: number): void {
-    // Ramps piece fall speed
     this.normalDropInterval = Math.max(100, Math.floor(1000 * Math.pow(0.85, level - 1)));
     this.fastDropInterval = Math.max(20, Math.floor(this.normalDropInterval * 0.1));
-
-    // Ramps BGM playback rate (e.g., +3% speed per level, capped at 1.5x speed)
     const bgmRate = Math.min(1.5, 1.0 + (level - 1) * 0.03);
     AudioManager.setBGMPlaybackRate(bgmRate);
   }
@@ -123,11 +105,7 @@ export class FallingPieceController {
 
   public tryRotate(): boolean {
     if (!this.activePiece) return false;
-
-    // Test rotation
     this.activePiece.rotateClockwise();
-
-    // Basic wall-kick offset testing (Center, Left 1, Right 1)
     const offsets = [0, -1, 1];
     for (const offset of offsets) {
       if (!this.checkCollision(this.activePiece, offset, 0)) {
@@ -136,7 +114,6 @@ export class FallingPieceController {
       }
     }
 
-    // If all offset tests fail, revert rotation
     this.activePiece.rotateCounterClockwise();
     return false;
   }
@@ -185,7 +162,6 @@ export class FallingPieceController {
       }
     }
 
-    // 2. Link newly landed spaghetti nodes into adjacent open pasta neighbors
     console.log("Calling linkNewSpaghettiNodes with positions:", placedPositions);
     this.chainManager.linkNewSpaghettiNodes(this.board, placedPositions);
 
@@ -193,9 +169,6 @@ export class FallingPieceController {
     this.delegate.onPieceLocked();
   }
 
-  /**
-   * Tests whether active piece would collide with board boundaries or locked blocks.
-   */
   private checkCollision(piece: Piece, offsetCol: number, offsetRow: number): boolean {
     const cells = piece.getOccupiedCells();
 
@@ -203,12 +176,10 @@ export class FallingPieceController {
       const targetCol = cell.col + offsetCol;
       const targetRow = cell.row + offsetRow;
 
-      // Wall / Floor Bounds Check
       if (targetCol < 0 || targetCol >= BOARD_CONFIG.COLS || targetRow < 0 || targetRow >= BOARD_CONFIG.ROWS) {
         return true;
       }
 
-      // Check against occupied board grid
       if (!this.board.isEmpty(targetCol, targetRow)) {
         return true;
       }

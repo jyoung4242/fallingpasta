@@ -22,7 +22,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   // Game Progress State
   private level: number = 1;
   private score: number = 0;
-  private chainTarget: number = 3; // Level 1 target
+  private chainTarget: number = 3;
   private currentChain: number = 0;
   private nextPiece: Piece | null = null;
   private isProcessingBoard: boolean = false;
@@ -32,23 +32,19 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private isPaused: boolean = false;
 
   public override onInitialize(_engine: ex.Engine): void {
-    // 1. Mount Board & HUD
     this.board = new BoardElement(BOARD_POSITION);
     this.hud = new HudElement(HUD_POSITION);
     this.audioControls = new AudioControlGroup(_engine.drawWidth - 80, 30);
-    this.add(this.audioControls);
-
-    this.add(this.board);
-    this.add(this.hud);
-
-    // 2. Instantiate Helpers
     this.generator = new PieceGenerator();
     this.controller = new FallingPieceController(this.board, this);
     this.resolver = new BoardResolver(this.board);
-    // Mount Pause Overlay
     this.pauseOverlay = new PauseOverlay(_engine.drawWidth, _engine.drawHeight);
+
+    this.add(this.audioControls);
+    this.add(this.board);
+    this.add(this.hud);
     this.add(this.pauseOverlay);
-    // 3. Defer initial game start to the microtask queue so HudElement.onInitialize runs first
+
     _engine.clock.schedule(() => {
       this.startNewGame();
     }, 50);
@@ -60,61 +56,42 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.chainTarget = 3;
     this.currentChain = 0;
     this.board.clearBoard();
-
-    // Set initial speed for Level 1
     this.controller.setLevelSpeed(this.level);
-
     this.nextPiece = this.generator.spawnPiece();
     this.spawnNextPiece();
   }
 
   private spawnNextPiece(): void {
     if (!this.nextPiece) return;
-
     const currentPiece = this.nextPiece;
-    // Generate the NEXT piece so preview is immediately ready
     this.nextPiece = this.generator.spawnPiece();
-
-    // Pass active piece to controller
     const spawnedSuccessfully = this.controller.spawnPiece(currentPiece);
     if (spawnedSuccessfully) {
       this.board.setActivePiece(currentPiece);
     }
-
-    // Force event broadcast immediately upon spawn
     this.syncHud();
   }
 
   public override onPreUpdate(engine: ex.Engine, delta: number): void {
     if (this.isProcessingBoard) return;
-
-    // Tick active piece physics & inputs
     if (!this.isPaused) this.controller.update(engine, delta);
   }
 
   public async onPieceLocked(): Promise<void> {
     this.board.setActivePiece(null);
     this.isProcessingBoard = true;
-
-    // Run Match-3 Clears, Cascades & Gravity
     const result = await this.resolver.resolveBoard();
 
-    // Score evaluation
     if (result.clearedCount > 0) {
       this.score += result.clearedCount * 100;
     }
-
     this.currentChain = result.longestSpaghettiChain;
     this.syncHud();
-
-    // Check Win Condition: Target Spaghetti Chain Reached
     if (this.currentChain >= this.chainTarget) {
       this.handleLevelComplete();
       this.isProcessingBoard = false;
       return;
     }
-
-    // Spawn Next Piece
     this.isProcessingBoard = false;
     this.spawnNextPiece();
   }
@@ -131,7 +108,6 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     Resources.sfx_level.play();
     this.board.clearBoard();
 
-    // Update fall speed for the new level
     this.controller.setLevelSpeed(this.level);
 
     gameEvents.emit("level:complete", {
@@ -149,7 +125,6 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
       levelReached: this.level,
     });
 
-    // Navigate to GameOver scene with context payload
     this.engine.goToScene("gameOver", {
       sceneActivationData: {
         finalScore: this.score,

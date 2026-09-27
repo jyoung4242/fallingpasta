@@ -10,12 +10,11 @@ export class AudioControlGroup extends ex.Actor {
       y,
       width: 140,
       height: 36,
-      z: 300, // Top UI layer
+      z: 300,
     });
   }
 
   public override onInitialize(_engine: ex.Engine): void {
-    // --- 1. MUTE BUTTON ---
     const muteBtn = new ex.Actor({
       x: -30,
       y: 0,
@@ -46,7 +45,6 @@ export class AudioControlGroup extends ex.Actor {
       this.updateVisualState();
     });
 
-    // --- 2. SKIP TRACK BUTTON ---
     const skipBtn = new ex.Actor({
       x: 35,
       y: 0,

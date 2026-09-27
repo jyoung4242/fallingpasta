@@ -1,8 +1,6 @@
 import { BoardElement } from "../Actors/board";
-import { BOARD_CONFIG, IngredientType, PastaNode } from "../gameTypes";
+import { PastaNode } from "../gameTypes";
 
-// Key map for short-hand board diagrams
-// Use uppercase for single items, and directions (N, S, E, W) for explicit Spaghetti connections
 export type ShortCell =
   | "." // Empty
   | "T" // Tomato
@@ -36,7 +34,6 @@ export function loadPrecomposedBoard(board: BoardElement, layout: ShortCell[][])
       } else if (token === "G") {
         board.setCell(c, r, "Garlic");
       } else if (token.startsWith("S")) {
-        // Construct PastaNode with explicit connections for test scenarios
         const node: PastaNode = {
           type: "Spaghetti",
           chainId: 1000 + r * numCols + c,

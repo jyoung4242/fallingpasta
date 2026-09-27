@@ -1,6 +1,5 @@
 import * as ex from "excalibur";
 import { HighScoreManager } from "../Lib/HighScoreManager";
-import { MuteButton } from "../Actors/muteButton";
 import { AudioControlGroup } from "../Actors/audiocontrol";
 import { AudioManager } from "../Lib/audioManager";
 
@@ -32,7 +31,6 @@ export class GameOverScene extends ex.Scene {
     if (context.data) {
       const { finalScore, levelReached } = context.data;
 
-      // Check and update high score
       const isNewHighScore = HighScoreManager.updateHighScore(finalScore);
       const highScore = HighScoreManager.getHighScore();
 
@@ -43,7 +41,6 @@ export class GameOverScene extends ex.Scene {
         this.levelLabel.text = `LEVEL REACHED: ${levelReached}`;
       }
 
-      // Show "NEW HIGH SCORE!" callout if beaten
       if (this.newRecordLabel) {
         this.newRecordLabel.graphics.opacity = isNewHighScore ? 1 : 0;
       }
@@ -90,7 +87,7 @@ export class GameOverScene extends ex.Scene {
         textAlign: ex.TextAlign.Center,
       }),
     });
-    this.newRecordLabel.graphics.opacity = 0; // Hidden by default
+    this.newRecordLabel.graphics.opacity = 0;
 
     this.scoreLabel = new ex.Label({
       text: "SCORE: 0  |  BEST: 0",
@@ -123,7 +120,6 @@ export class GameOverScene extends ex.Scene {
   private createButtons(engine: ex.Engine): void {
     const centerX = engine.drawWidth / 2;
 
-    // --- RESTART BUTTON ---
     const restartBtn = new ex.Actor({
       x: centerX,
       y: 350,
@@ -152,7 +148,6 @@ export class GameOverScene extends ex.Scene {
       engine.goToScene("game");
     });
 
-    // --- MAIN MENU BUTTON ---
     const menuBtn = new ex.Actor({
       x: centerX,
       y: 420,

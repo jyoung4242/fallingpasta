@@ -1,6 +1,5 @@
 import * as ex from "excalibur";
 import { HighScoreManager } from "../Lib/HighScoreManager";
-import { MuteButton } from "../Actors/muteButton";
 import { AudioControlGroup } from "../Actors/audiocontrol";
 import { Resources } from "../resources";
 
@@ -10,8 +9,8 @@ interface RevivableActor extends ex.Actor {
 
 export class MainMenuScene extends ex.Scene {
   private howToPlayOverlay!: RevivableActor;
-  private isHowToPlayVisible: boolean = false;
   private audioControls!: AudioControlGroup;
+  isHowToPlayVisible: boolean = false;
 
   public override onInitialize(engine: ex.Engine): void {
     this.createBackground(engine);
@@ -86,7 +85,6 @@ export class MainMenuScene extends ex.Scene {
   private createMenuButtons(engine: ex.Engine): void {
     const centerX = engine.drawWidth / 2;
 
-    // --- PLAY BUTTON ---
     const playBtn = new ex.Actor({
       x: centerX,
       y: 280,
@@ -113,10 +111,9 @@ export class MainMenuScene extends ex.Scene {
     playBtn.on("pointerleave", () => (playBtn.color = ex.Color.fromHex("#08d9d6")));
     playBtn.on("pointerup", () => {
       Resources.sfx_select.play();
-      engine.goToScene("game"); // Transition to main gameplay scene
+      engine.goToScene("game");
     });
 
-    // --- HOW TO PLAY BUTTON ---
     const howToPlayBtn = new ex.Actor({
       x: centerX,
       y: 350,
@@ -153,7 +150,6 @@ export class MainMenuScene extends ex.Scene {
     const centerX = engine.drawWidth / 2;
     const centerY = engine.drawHeight / 2;
 
-    // Dark semi-transparent backdrop panel
     this.howToPlayOverlay = new ex.Actor({
       x: centerX,
       y: centerY,
@@ -163,7 +159,6 @@ export class MainMenuScene extends ex.Scene {
       z: 100, // Ensure it draws over menu elements
     }) as RevivableActor;
 
-    // Define the custom revive method directly on the actor instance
     this.howToPlayOverlay.revive = () => {
       this.howToPlayOverlay.graphics.opacity = 1;
       this.howToPlayOverlay.pointer.useGraphicsBounds = true;
@@ -174,7 +169,6 @@ export class MainMenuScene extends ex.Scene {
       });
     };
 
-    // Override kill to handle custom hide logic
     const originalKill = this.howToPlayOverlay.kill.bind(this.howToPlayOverlay);
     this.howToPlayOverlay.kill = () => {
       this.howToPlayOverlay.graphics.opacity = 0;
@@ -187,7 +181,6 @@ export class MainMenuScene extends ex.Scene {
       return this.howToPlayOverlay;
     };
 
-    // Header Title
     const header = new ex.Label({
       text: "HOW TO PLAY",
       pos: ex.vec(0, -150),
@@ -201,7 +194,6 @@ export class MainMenuScene extends ex.Scene {
     });
     this.howToPlayOverlay.addChild(header);
 
-    // Rule Instructions
     const rules = [
       "1. CONTROLS: Arrow keys / WASD to move & rotate pieces.",
       "   UP rotates, DOWN drops, L/R moves piece horizontally",
@@ -229,7 +221,6 @@ export class MainMenuScene extends ex.Scene {
       this.howToPlayOverlay.addChild(lineLabel);
     });
 
-    // Close / Back Button
     const closeBtn = new ex.Actor({
       x: 0,
       y: 260,
@@ -256,10 +247,9 @@ export class MainMenuScene extends ex.Scene {
 
     this.howToPlayOverlay.addChild(closeBtn);
 
-    // Add overlay to scene and hide initially
     this.add(this.howToPlayOverlay);
     this.howToPlayOverlay.graphics.opacity = 0;
-    this.howToPlayOverlay.kill(); // Disable input & interaction while hidden
+    this.howToPlayOverlay.kill();
   }
 
   private toggleHowToPlay(show: boolean): void {
