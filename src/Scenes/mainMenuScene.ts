@@ -158,7 +158,7 @@ export class MainMenuScene extends ex.Scene {
       x: centerX,
       y: centerY,
       width: 480,
-      height: 380,
+      height: 450,
       color: ex.Color.fromRGB(20, 20, 35, 0.95),
       z: 100, // Ensure it draws over menu elements
     }) as RevivableActor;
@@ -212,6 +212,7 @@ export class MainMenuScene extends ex.Scene {
       "   Instead, adjacent Spaghetti links together automatically.",
       "4. GOAL: Connect Spaghetti into chains to reach target ,",
       "   length to hit level goal",
+      "5. PAUSE: press the ` key to pause the game ,",
     ];
 
     rules.forEach((line, index) => {
@@ -231,7 +232,7 @@ export class MainMenuScene extends ex.Scene {
     // Close / Back Button
     const closeBtn = new ex.Actor({
       x: 0,
-      y: 250,
+      y: 260,
       width: 140,
       height: 40,
       color: ex.Color.fromHex("#ff2e63"),
