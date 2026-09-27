@@ -169,14 +169,30 @@ export class PastaCascadeLoader extends DefaultLoader {
     this._gameRootDiv.appendChild(this._playButton);
 
     return new Promise<void>(resolve => {
-      const startButtonHandler = (e: Event) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this._playButton.removeEventListener("click", startButtonHandler);
+      const unlockAudioAndStart = async (e: Event) => {
+        // 1. Explicitly unlock WebAudio for iOS Safari / Mobile Chrome
+
+        // 2. Cleanup event listeners
+        this._playButton.removeEventListener("click", unlockAudioAndStart);
+        this._playButton.removeEventListener("touchend", unlockAudioAndStart);
+        this._playButton.removeEventListener("pointerdown", unlockAudioAndStart);
+        window.removeEventListener("keydown", keyHandler);
+
         this.dispose();
         resolve();
       };
-      this._playButton.addEventListener("click", startButtonHandler);
+
+      const keyHandler = (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          unlockAudioAndStart(e);
+        }
+      };
+
+      // Listen to touch/pointer events directly for immediate mobile response
+      this._playButton.addEventListener("click", unlockAudioAndStart);
+      this._playButton.addEventListener("touchend", unlockAudioAndStart);
+      this._playButton.addEventListener("pointerdown", unlockAudioAndStart);
+      window.addEventListener("keydown", keyHandler);
     });
   }
 
