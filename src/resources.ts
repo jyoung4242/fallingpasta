@@ -24,6 +24,7 @@ import sfx_select from "./Assets/sfx/buttonselect.mp3";
 import sfx_match from "./Assets/sfx/match.mp3";
 import sfx_move from "./Assets/sfx/move.mp3";
 import sfx_rotate from "./Assets/sfx/rotate.mp3";
+
 import sfx_level from "./Assets/sfx/levelClear.wav";
 
 export const Resources = {
