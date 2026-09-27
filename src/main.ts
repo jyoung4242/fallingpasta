@@ -14,7 +14,7 @@ import { Engine, DisplayMode, vec, SoundManager, Color } from "excalibur";
 const game = new Engine({
   width: 800, // the width of the canvas
   height: 800, // the height of the canvas
-  displayMode: DisplayMode.Fixed, // the display mode
+  displayMode: DisplayMode.FitScreen, // the display mode
   pixelArt: true,
   scenes: {
     game: new GameScene(),
