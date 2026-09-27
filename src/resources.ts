@@ -25,7 +25,7 @@ import sfx_match from "./Assets/sfx/match.mp3";
 import sfx_move from "./Assets/sfx/move.mp3";
 import sfx_rotate from "./Assets/sfx/rotate.mp3";
 
-import sfx_level from "./Assets/sfx/levelClear.wav";
+import sfx_level from "./Assets/sfx/clearedLevel.wav";
 
 export const Resources = {
   pasta: new ImageSource(pasta),
