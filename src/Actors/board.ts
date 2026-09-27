@@ -24,6 +24,7 @@ export class BoardElement extends ex.Actor {
       width: BOARD_CONFIG.WIDTH,
       height: BOARD_CONFIG.HEIGHT,
       anchor: ex.Vector.Zero,
+      canPause: true,
     });
 
     this.grid = Array.from({ length: BOARD_CONFIG.ROWS }, () => Array(BOARD_CONFIG.COLS).fill(null));

@@ -1,15 +1,13 @@
 // main.ts
-import { BoardElement } from "./Actors/board";
-import { HudElement } from "./Actors/hud";
-import { BOARD_POSITION, HUD_POSITION } from "./gameTypes";
+
 import { AudioManager } from "./Lib/audioManager";
-import { loader, Resources } from "./resources";
+import { loader } from "./resources";
 import { GameOverScene } from "./Scenes/GameOver";
 import { GameScene } from "./Scenes/gameScene";
 import { MainMenuScene } from "./Scenes/mainMenuScene";
 import "./style.css";
 
-import { Engine, DisplayMode, vec, SoundManager, Color } from "excalibur";
+import { Engine, DisplayMode, Color } from "excalibur";
 
 const game = new Engine({
   width: 800, // the width of the canvas

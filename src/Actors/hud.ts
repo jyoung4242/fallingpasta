@@ -26,6 +26,7 @@ export class HudElement extends ex.Actor {
       width: 320,
       height: 768,
       anchor: ex.Vector.Zero,
+      canPause: true,
     });
   }
 

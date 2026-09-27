@@ -9,6 +9,7 @@ import { gameEvents } from "../Lib/GameEvents";
 import { AudioControlGroup } from "../Actors/audiocontrol";
 import { Resources } from "../resources";
 import { AudioManager } from "../Lib/audioManager";
+import { PauseOverlay } from "../Actors/pauseoverlay";
 
 export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private board!: BoardElement;
@@ -16,6 +17,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private generator!: PieceGenerator;
   private controller!: FallingPieceController;
   private resolver!: BoardResolver;
+  private pauseOverlay!: PauseOverlay;
 
   // Game Progress State
   private level: number = 1;
@@ -26,6 +28,8 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private isProcessingBoard: boolean = false;
 
   private audioControls!: AudioControlGroup;
+
+  private isPaused: boolean = false;
 
   public override onInitialize(_engine: ex.Engine): void {
     // 1. Mount Board & HUD
@@ -41,7 +45,9 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.generator = new PieceGenerator();
     this.controller = new FallingPieceController(this.board, this);
     this.resolver = new BoardResolver(this.board);
-
+    // Mount Pause Overlay
+    this.pauseOverlay = new PauseOverlay(_engine.drawWidth, _engine.drawHeight);
+    this.add(this.pauseOverlay);
     // 3. Defer initial game start to the microtask queue so HudElement.onInitialize runs first
     _engine.clock.schedule(() => {
       this.startNewGame();
@@ -78,16 +84,13 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     // Force event broadcast immediately upon spawn
     this.syncHud();
   }
+
   public override onPreUpdate(engine: ex.Engine, delta: number): void {
     if (this.isProcessingBoard) return;
 
     // Tick active piece physics & inputs
-    this.controller.update(engine, delta);
+    if (!this.isPaused) this.controller.update(engine, delta);
   }
-
-  // -------------------------------------------------------------------------
-  // PieceControllerDelegate Callback
-  // -------------------------------------------------------------------------
 
   public async onPieceLocked(): Promise<void> {
     this.board.setActivePiece(null);
@@ -161,6 +164,26 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     }
 
     this.startNewGame();
+    let engine = context.engine;
+    engine.input.keyboard.on("press", this.handlePauseButton);
+  }
+
+  handlePauseButton = (e: ex.KeyEvent) => {
+    if (e.key == ex.Keys.Backquote) {
+      this.isPaused = !this.isPaused;
+      if (this.isPaused) {
+        this.pause();
+        this.pauseOverlay.show();
+      } else {
+        this.resume();
+        this.pauseOverlay.hide();
+      }
+    }
+  };
+
+  onDeactivate(context: ex.SceneActivationContext) {
+    let engine = context.engine;
+    engine.input.keyboard.off("press", this.handlePauseButton);
   }
 
   private syncHud(): void {
