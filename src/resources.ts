@@ -26,6 +26,7 @@ import sfx_move from "./Assets/sfx/move.mp3";
 import sfx_rotate from "./Assets/sfx/rotate.mp3";
 
 import sfx_level from "./Assets/sfx/clearedLevel.wav";
+import { PastaCascadeLoader } from "./Lib/CustomLoader";
 
 export const Resources = {
   pasta: new ImageSource(pasta),
@@ -51,7 +52,7 @@ export const Resources = {
   sfx_level: new Sound(sfx_level),
 };
 
-export const loader = new Loader();
+export const loader = new PastaCascadeLoader();
 
 for (let res of Object.values(Resources)) {
   loader.addResource(res);
