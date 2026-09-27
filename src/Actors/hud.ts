@@ -35,8 +35,8 @@ export class HudElement extends ex.Actor {
     const titleActor = new ex.ScreenElement({ pos: ex.vec(0, 0), anchor: ex.Vector.Zero });
     titleActor.graphics.use(
       new ex.Text({
-        text: "Pasta Drop",
-        font: new ex.Font({ size: 36, family: "sans-serif", color: ex.Color.White, bold: true }),
+        text: "Pasta Cascade",
+        font: new ex.Font({ size: 28, family: "sans-serif", color: ex.Color.White, bold: true }),
       }),
     );
     this.addChild(titleActor);
@@ -45,7 +45,7 @@ export class HudElement extends ex.Actor {
     nextLabel.graphics.use(
       new ex.Text({
         text: "Next Block",
-        font: new ex.Font({ size: 20, family: "sans-serif", color: ex.Color.fromHex("#CCCCCC") }),
+        font: new ex.Font({ size: 20, family: "sans-serif", color: ex.Color.fromHex("#DDDDDD") }),
       }),
     );
     this.addChild(nextLabel);
@@ -87,7 +87,7 @@ export class HudElement extends ex.Actor {
     const scoreValActor = new ex.ScreenElement({ pos: ex.vec(0, 410), anchor: ex.Vector.Zero });
     this.scoreText = new ex.Text({
       text: "0000000",
-      font: new ex.Font({ size: 32, family: "monospace", color: ex.Color.fromHex("#4EAEFF") }),
+      font: new ex.Font({ size: 32, family: "monospace", color: ex.Color.fromHex("#023763") }),
     });
     scoreValActor.graphics.use(this.scoreText);
     this.addChild(scoreValActor);

@@ -34,7 +34,7 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
   public override onInitialize(_engine: ex.Engine): void {
     this.board = new BoardElement(BOARD_POSITION);
     this.hud = new HudElement(HUD_POSITION);
-    this.audioControls = new AudioControlGroup(_engine.drawWidth - 80, 30);
+    this.audioControls = new AudioControlGroup(_engine.drawWidth - 60, 30);
     this.generator = new PieceGenerator();
     this.controller = new FallingPieceController(this.board, this);
     this.resolver = new BoardResolver(this.board);
