@@ -4,6 +4,7 @@ import { BoardElement } from "../Actors/board";
 import { SpaghettiChainManager } from "./SpaghettiChain";
 import { Resources } from "../resources";
 import { AudioManager } from "./audioManager";
+import { Signal } from "./Signals";
 
 export interface PieceControllerDelegate {
   onPieceLocked: () => void;
@@ -20,10 +21,20 @@ export class FallingPieceController {
   public fastDropInterval: number = 50;
   private keyRepeatTimer: number = 0;
   private keyRepeatDelay: number = 120;
+  private upSignal: Signal = new Signal("rotate");
+  private dropSignal: Signal = new Signal("drop");
 
   constructor(board: BoardElement, delegate: PieceControllerDelegate) {
     this.board = board;
     this.delegate = delegate;
+    this.upSignal.listen(() => {
+      Resources.sfx_rotate.play();
+      this.tryRotate();
+    });
+    this.dropSignal.listen(() => {
+      Resources.sfx_move.play();
+      this.hardDrop();
+    });
   }
 
   public spawnPiece(piece: Piece): boolean {

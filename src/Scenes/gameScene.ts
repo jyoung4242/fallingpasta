@@ -10,6 +10,7 @@ import { AudioControlGroup } from "../Actors/audiocontrol";
 import { Resources } from "../resources";
 import { AudioManager } from "../Lib/audioManager";
 import { PauseOverlay } from "../Actors/pauseoverlay";
+import { TouchPad } from "../Lib/TouchPad";
 
 export class GameScene extends ex.Scene implements PieceControllerDelegate {
   private board!: BoardElement;
@@ -44,6 +45,12 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.add(this.board);
     this.add(this.hud);
     this.add(this.pauseOverlay);
+
+    const touchPad = new TouchPad({
+      position: new ex.Vector(_engine.screen.contentArea.right - 100, _engine.screen.contentArea.bottom - 80),
+    });
+
+    this.add(touchPad);
 
     _engine.clock.schedule(() => {
       this.startNewGame();
