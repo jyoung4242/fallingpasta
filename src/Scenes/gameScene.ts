@@ -47,8 +47,8 @@ export class GameScene extends ex.Scene implements PieceControllerDelegate {
     this.add(this.pauseOverlay);
 
     const touchPad = new TouchPad({
-      position: new ex.Vector(_engine.screen.contentArea.right - 125, _engine.screen.contentArea.bottom - 80),
-      buttonSize: 75,
+      position: new ex.Vector(_engine.screen.contentArea.right - 175, _engine.screen.contentArea.bottom - 80),
+      buttonSize: 90,
     });
 
     this.add(touchPad);
