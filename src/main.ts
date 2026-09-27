@@ -9,7 +9,7 @@ import { GameScene } from "./Scenes/gameScene";
 import { MainMenuScene } from "./Scenes/mainMenuScene";
 import "./style.css";
 
-import { Engine, DisplayMode, vec, SoundManager } from "excalibur";
+import { Engine, DisplayMode, vec, SoundManager, Color } from "excalibur";
 
 const game = new Engine({
   width: 800, // the width of the canvas
@@ -21,6 +21,7 @@ const game = new Engine({
     main: new MainMenuScene(),
     gameOver: new GameOverScene(),
   },
+  backgroundColor: Color.fromHex("#059ef8"),
 });
 
 await game.start(loader);

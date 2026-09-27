@@ -1,3 +1,2 @@
 - noodles need to be nicer drawing
-- adjust balance
 - finish itch page
