@@ -98,126 +98,321 @@ export class BoardElement extends ex.Actor {
     return ex.vec(col * BOARD_CONFIG.TILE_SIZE, row * BOARD_CONFIG.TILE_SIZE);
   }
 
+  // private drawBoard(ctx: CanvasRenderingContext2D): void {
+  //   const tileSize = BOARD_CONFIG.TILE_SIZE;
+
+  //   // 1. Background Pass
+  //   ctx.fillStyle = "#1E1E24";
+  //   ctx.fillRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
+
+  //   // 2. Grid Pass
+  //   for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
+  //     for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
+  //       const x = c * tileSize;
+  //       const y = r * tileSize;
+
+  //       if ((r + c) % 2 === 1) {
+  //         ctx.fillStyle = "#25252D";
+  //         ctx.fillRect(x, y, tileSize, tileSize);
+  //       }
+
+  //       ctx.strokeStyle = "#2B2D42";
+  //       ctx.lineWidth = 1;
+  //       ctx.strokeRect(x, y, tileSize, tileSize);
+
+  //       // Check for locked PastaNode structure
+  //       const pastaNode = this.getPastaNode(c, r);
+
+  //       if (pastaNode) {
+  //         // Render dynamic connected noodle ONLY after piece has settled & locked connections
+  //         // console.log(`Drawing PastaNode at (${c}, ${r}) with connections:`, pastaNode.connections);
+  //         this.drawPastaNode(ctx, c, r, pastaNode.connections);
+  //       } else {
+  //         // Render static sprite for standard ingredients
+  //         const ingredient = this.getCell(c, r);
+  //         if (ingredient) {
+  //           const imgSource = INGREDIENT_IMAGES[ingredient as IngredientType];
+  //           if (imgSource?.isLoaded()) {
+  //             ctx.drawImage(imgSource.image, x, y, tileSize, tileSize);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   // 3. Falling Piece Pass (Uses static sprites)
+  //   if (this.activePiece) {
+  //     this.drawActivePiece(ctx, this.activePiece);
+  //   }
+
+  //   // 4. Board Outer Frame
+  //   ctx.strokeStyle = "#4A4E69";
+  //   ctx.lineWidth = 3;
+  //   ctx.strokeRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
+  // }
   private drawBoard(ctx: CanvasRenderingContext2D): void {
-    const tileSize = BOARD_CONFIG.TILE_SIZE;
+    const tileSize = BOARD_CONFIG.TILE_SIZE; //[cite: 2]
 
-    // 1. Background Pass
-    ctx.fillStyle = "#1E1E24";
-    ctx.fillRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
+    // 1. Background Pass[cite: 2]
+    ctx.fillStyle = "#1E1E24"; //[cite: 2]
+    ctx.fillRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT); //[cite: 2]
 
-    // 2. Grid Pass
+    // 2. Grid & Static Tiles Pass[cite: 2]
     for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
+      //[cite: 2]
       for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
-        const x = c * tileSize;
-        const y = r * tileSize;
+        //[cite: 2]
+        const x = c * tileSize; //[cite: 2]
+        const y = r * tileSize; //[cite: 2]
 
         if ((r + c) % 2 === 1) {
-          ctx.fillStyle = "#25252D";
-          ctx.fillRect(x, y, tileSize, tileSize);
-        }
+          //[cite: 2]
+          ctx.fillStyle = "#25252D"; //[cite: 2]
+          ctx.fillRect(x, y, tileSize, tileSize); //[cite: 2]
+        } //[cite: 2]
 
-        ctx.strokeStyle = "#2B2D42";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, y, tileSize, tileSize);
+        ctx.strokeStyle = "#2B2D42"; //[cite: 2]
+        ctx.lineWidth = 1; //[cite: 2]
+        ctx.strokeRect(x, y, tileSize, tileSize); //[cite: 2]
 
-        // Check for locked PastaNode structure
-        const pastaNode = this.getPastaNode(c, r);
+        const cell = this.getCell(c, r); //[cite: 2]
+        const pastaNode = this.getPastaNode(c, r); //[cite: 2]
 
+        // Draw static ingredient images (or lone unconnected spaghetti)[cite: 2]
         if (pastaNode) {
-          // Render dynamic connected noodle ONLY after piece has settled & locked connections
-          // console.log(`Drawing PastaNode at (${c}, ${r}) with connections:`, pastaNode.connections);
-          this.drawPastaNode(ctx, c, r, pastaNode.connections);
-        } else {
-          // Render static sprite for standard ingredients
-          const ingredient = this.getCell(c, r);
-          if (ingredient) {
-            const imgSource = INGREDIENT_IMAGES[ingredient as IngredientType];
-            if (imgSource?.isLoaded()) {
-              ctx.drawImage(imgSource.image, x, y, tileSize, tileSize);
-            }
+          //[cite: 2]
+          const hasConnection = Object.values(pastaNode.connections).some(Boolean); //
+          if (!hasConnection) {
+            //
+            const imgSource = INGREDIENT_IMAGES["Spaghetti"]; //[cite: 2]
+            if (imgSource?.isLoaded()) ctx.drawImage(imgSource.image, x, y, tileSize, tileSize); //[cite: 2]
           }
+        } else if (cell) {
+          //[cite: 2]
+          const imgSource = INGREDIENT_IMAGES[cell as IngredientType]; //[cite: 2]
+          if (imgSource?.isLoaded()) ctx.drawImage(imgSource.image, x, y, tileSize, tileSize); //[cite: 2]
         }
       }
     }
 
-    // 3. Falling Piece Pass (Uses static sprites)
-    if (this.activePiece) {
-      this.drawActivePiece(ctx, this.activePiece);
+    // 3. NOODLE PASS 1: Draw ALL Dark Outlines First[cite: 2]
+    for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
+      //[cite: 2]
+      for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
+        //[cite: 2]
+        const pastaNode = this.getPastaNode(c, r); //[cite: 2]
+        if (pastaNode && Object.values(pastaNode.connections).some(Boolean)) {
+          //[cite: 2]
+          this.drawPastaNodePass(ctx, c, r, pastaNode.connections, "shadow"); //[cite: 2]
+        }
+      }
     }
 
-    // 4. Board Outer Frame
-    ctx.strokeStyle = "#4A4E69";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT);
+    // 4. NOODLE PASS 2: Draw ALL Golden Pasta & Sauce Highlights On Top[cite: 2]
+    for (let r = 0; r < BOARD_CONFIG.ROWS; r++) {
+      //[cite: 2]
+      for (let c = 0; c < BOARD_CONFIG.COLS; c++) {
+        //[cite: 2]
+        const pastaNode = this.getPastaNode(c, r); //[cite: 2]
+        if (pastaNode && Object.values(pastaNode.connections).some(Boolean)) {
+          //[cite: 2]
+          this.drawPastaNodePass(ctx, c, r, pastaNode.connections, "body"); //[cite: 2]
+        }
+      }
+    }
+
+    // 5. Active Falling Piece Pass[cite: 2]
+    if (this.activePiece) {
+      //[cite: 2]
+      this.drawActivePiece(ctx, this.activePiece); //[cite: 2]
+    }
+
+    // 6. Board Frame[cite: 2]
+    ctx.strokeStyle = "#4A4E69"; //[cite: 2]
+    ctx.lineWidth = 3; //[cite: 2]
+    ctx.strokeRect(0, 0, BOARD_CONFIG.WIDTH, BOARD_CONFIG.HEIGHT); //[cite: 2]
   }
 
   /**
    * Renders a Spaghetti noodle segment using directional connection flags.
    */
-  private drawPastaNode(ctx: CanvasRenderingContext2D, col: number, row: number, connections: Record<Direction, boolean>): void {
-    const tileSize = BOARD_CONFIG.TILE_SIZE;
-    const cx = col * tileSize + tileSize / 2;
-    const cy = row * tileSize + tileSize / 2;
-    const noodleRadius = 7;
-    const noodleWidth = 14;
+  // private drawPastaNode(ctx: CanvasRenderingContext2D, col: number, row: number, connections: Record<Direction, boolean>): void {
+  //   const tileSize = BOARD_CONFIG.TILE_SIZE;
+  //   const cx = col * tileSize + tileSize / 2;
+  //   const cy = row * tileSize + tileSize / 2;
+  //   const noodleRadius = 7;
+  //   const noodleWidth = 14;
 
-    ctx.save();
+  //   ctx.save();
 
-    // Primary Noodle Base Pass (Warm Golden Pasta)
-    ctx.strokeStyle = "#F4A261";
-    ctx.fillStyle = "#F4A261";
-    ctx.lineWidth = noodleWidth;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+  //   // Primary Noodle Base Pass (Warm Golden Pasta)
+  //   ctx.strokeStyle = "#F4A261";
+  //   ctx.fillStyle = "#F4A261";
+  //   ctx.lineWidth = noodleWidth;
+  //   ctx.lineCap = "round";
+  //   ctx.lineJoin = "round";
 
-    ctx.beginPath();
-    // Central connection hub
-    ctx.arc(cx, cy, noodleRadius, 0, Math.PI * 2);
-    ctx.fill();
+  //   ctx.beginPath();
+  //   // Central connection hub
+  //   ctx.arc(cx, cy, noodleRadius, 0, Math.PI * 2);
+  //   ctx.fill();
 
-    // Extend strokes towards cell edges according to active connections
-    if (connections.N) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, row * tileSize);
-    }
-    if (connections.E) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo((col + 1) * tileSize, cy);
-    }
-    if (connections.S) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, (row + 1) * tileSize);
-    }
-    if (connections.W) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(col * tileSize, cy);
-    }
-    ctx.stroke();
+  //   // Extend strokes towards cell edges according to active connections
+  //   if (connections.N) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(cx, row * tileSize);
+  //   }
+  //   if (connections.E) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo((col + 1) * tileSize, cy);
+  //   }
+  //   if (connections.S) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(cx, (row + 1) * tileSize);
+  //   }
+  //   if (connections.W) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(col * tileSize, cy);
+  //   }
+  //   ctx.stroke();
 
-    // Inner Sauce Highlight Pass for 3D Depth
-    ctx.strokeStyle = "#E9C46A";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    if (connections.N) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, row * tileSize);
-    }
-    if (connections.E) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo((col + 1) * tileSize, cy);
-    }
-    if (connections.S) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, (row + 1) * tileSize);
-    }
-    if (connections.W) {
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(col * tileSize, cy);
-    }
-    ctx.stroke();
+  //   // Inner Sauce Highlight Pass for 3D Depth
+  //   ctx.strokeStyle = "#E9C46A";
+  //   ctx.lineWidth = 4;
+  //   ctx.beginPath();
+  //   if (connections.N) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(cx, row * tileSize);
+  //   }
+  //   if (connections.E) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo((col + 1) * tileSize, cy);
+  //   }
+  //   if (connections.S) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(cx, (row + 1) * tileSize);
+  //   }
+  //   if (connections.W) {
+  //     ctx.moveTo(cx, cy);
+  //     ctx.lineTo(col * tileSize, cy);
+  //   }
+  //   ctx.stroke();
 
-    ctx.restore();
+  //   ctx.restore();
+  // }
+
+  private drawPastaNodePass(
+    ctx: CanvasRenderingContext2D, //[cite: 2]
+    col: number, //[cite: 2]
+    row: number, //[cite: 2]
+    connections: Record<Direction, boolean>, //[cite: 2]
+    pass: "shadow" | "body", //[cite: 2]
+  ): void {
+    const tileSize = BOARD_CONFIG.TILE_SIZE; //[cite: 2]
+    const cx = col * tileSize + tileSize / 2; //[cite: 2]
+    const cy = row * tileSize + tileSize / 2; //[cite: 2]
+    const noodleWidth = 14; //
+    const overlap = 3; // Seamless connection overlap
+
+    const wX = this.getDeterministicOffset(col, row, 1, 2.0); //
+    const wY = this.getDeterministicOffset(col, row, 2, 2.0); //
+    const midX = cx + wX; //
+    const midY = cy + wY; //
+
+    const topPoint = { x: cx, y: row * tileSize - overlap }; //
+    const rightPoint = { x: (col + 1) * tileSize + overlap, y: cy }; //
+    const bottomPoint = { x: cx, y: (row + 1) * tileSize + overlap }; //
+    const leftPoint = { x: col * tileSize - overlap, y: cy }; //
+
+    ctx.save(); //
+
+    const tracePastaPaths = (context: CanvasRenderingContext2D) => {
+      //
+      context.beginPath(); //
+      const activeDirs = (["N", "E", "S", "W"] as Direction[]).filter(d => connections[d]); //
+
+      if (activeDirs.length !== 2) {
+        //
+        if (connections.N) {
+          context.moveTo(midX, midY);
+          context.quadraticCurveTo(cx + wX * 0.5, (cy + topPoint.y) / 2, topPoint.x, topPoint.y);
+        } //
+        if (connections.E) {
+          context.moveTo(midX, midY);
+          context.quadraticCurveTo((cx + rightPoint.x) / 2, cy + wY * 0.5, rightPoint.x, rightPoint.y);
+        } //
+        if (connections.S) {
+          context.moveTo(midX, midY);
+          context.quadraticCurveTo(cx + wX * 0.5, (cy + bottomPoint.y) / 2, bottomPoint.x, bottomPoint.y);
+        } //
+        if (connections.W) {
+          context.moveTo(midX, midY);
+          context.quadraticCurveTo((cx + leftPoint.x) / 2, cy + wY * 0.5, leftPoint.x, leftPoint.y);
+        } //
+      } else if (connections.N && connections.E) {
+        //
+        context.moveTo(topPoint.x, topPoint.y);
+        context.quadraticCurveTo(midX, midY, rightPoint.x, rightPoint.y); //
+      } else if (connections.E && connections.S) {
+        //
+        context.moveTo(rightPoint.x, rightPoint.y);
+        context.quadraticCurveTo(midX, midY, bottomPoint.x, bottomPoint.y); //
+      } else if (connections.S && connections.W) {
+        //
+        context.moveTo(bottomPoint.x, bottomPoint.y);
+        context.quadraticCurveTo(midX, midY, leftPoint.x, leftPoint.y); //
+      } else if (connections.W && connections.N) {
+        //
+        context.moveTo(leftPoint.x, leftPoint.y);
+        context.quadraticCurveTo(midX, midY, topPoint.x, topPoint.y); //
+      } else if (connections.N && connections.S) {
+        //
+        context.moveTo(topPoint.x, topPoint.y);
+        context.quadraticCurveTo(midX, midY, bottomPoint.x, bottomPoint.y); //
+      } else if (connections.E && connections.W) {
+        //
+        context.moveTo(leftPoint.x, leftPoint.y);
+        context.quadraticCurveTo(midX, midY, rightPoint.x, rightPoint.y); //
+      }
+    };
+
+    if (pass === "shadow") {
+      //
+      // Draw ONLY dark outline for all tiles first
+      ctx.strokeStyle = "#1A0900"; //
+      ctx.lineWidth = noodleWidth + 4; //
+      ctx.lineCap = "round"; //
+      ctx.lineJoin = "round"; //
+      tracePastaPaths(ctx); //
+      ctx.stroke(); //
+    } else {
+      // Draw primary golden noodle body & inner sauce highlight on top
+      ctx.lineCap = "round"; //
+      ctx.lineJoin = "round"; //
+
+      ctx.strokeStyle = "#F4A261"; //
+      ctx.lineWidth = noodleWidth; //
+      tracePastaPaths(ctx); //
+      ctx.stroke(); //
+
+      ctx.strokeStyle = "#E9C46A"; //
+      ctx.lineWidth = 4; //
+      tracePastaPaths(ctx); //
+      ctx.stroke(); //
+    }
+
+    ctx.restore(); //
   }
+
+  /**
+   * Pseudo-random generator seeded by cell position & key to ensure seamless borders.
+   */
+  private getDeterministicOffset(col: number, row: number, seedKey: number, intensity: number = 2.5): number {
+    const seed = (col * 73856093) ^ (row * 19349663) ^ (seedKey * 83492791);
+    const x = Math.sin(seed) * 10000;
+    return (x - Math.floor(x) - 0.5) * 2 * intensity; // Value between -intensity and +intensity
+  }
+
   /**
    * Renders an immutable Spaghetti strand using stored directional connection flags.
    */

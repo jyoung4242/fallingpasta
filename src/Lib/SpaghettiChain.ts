@@ -4,11 +4,6 @@ import { Direction } from "../gameTypes";
 export class SpaghettiChainManager {
   private nextChainId = 1;
 
-  /**
-   * Processes new spaghetti blocks placed on the board, establishing immutable links.
-   */
-  // Inside SpaghettiChain.ts
-  // SpaghettiChain.ts
   public linkNewSpaghettiNodes(board: BoardElement, newCells: { col: number; row: number }[]): void {
     // Check if cell is string "Spaghetti" OR a PastaNode object with type "Spaghetti"
     const spaghettiCells = newCells.filter(c => {
@@ -18,8 +13,6 @@ export class SpaghettiChainManager {
       }
       return rawCell?.type === "Spaghetti";
     });
-
-    console.log("Spaghetti cells to process for linking:", spaghettiCells);
 
     for (const cell of spaghettiCells) {
       const node = board.getPastaNode(cell.col, cell.row);
